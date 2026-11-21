@@ -1,0 +1,55 @@
+diff --git a/src/main.cpp b/src/main.cpp
+index 98352b3..4404158 100644
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -15,9 +15,9 @@
+ #include <hyprland/src/config/values/types/StringValue.hpp>
+ #include <hyprland/src/event/EventBus.hpp>
+ #include <hyprland/src/managers/input/InputManager.hpp>
+-#include <hyprland/src/output/Monitor.hpp>
++#include <hyprland/src/Compositor.hpp>
++#include <hyprland/src/helpers/Monitor.hpp>
+ #include <hyprland/src/plugins/PluginAPI.hpp>
+-#include <hyprland/src/state/MonitorState.hpp>
+ 
+ extern "C" {
+ #include <lauxlib.h>
+@@ -48,21 +48,19 @@ SDispatchResult failure(std::string message) {
+ }
+ 
+ PHLMONITOR monitorUnderPointer() {
+-  if (!g_pInputManager || !State::monitorState())
++  if (!g_pInputManager || !g_pCompositor)
+     return nullptr;
+ 
+-  return State::monitorState()
+-      ->query()
+-      .vec(g_pInputManager->getMouseCoordsInternal())
+-      .run();
++  return g_pCompositor->getMonitorFromVector(
++      g_pInputManager->getMouseCoordsInternal());
+ }
+ 
+ std::vector<PHLMONITOR> targetMonitors() {
+-  if (!State::monitorState())
++  if (!g_pCompositor)
+     return {};
+ 
+   if (!config.independentDisplays->value())
+-    return State::monitorState()->monitors();
++    return g_pCompositor->m_monitors;
+ 
+   const auto monitor = monitorUnderPointer();
+   return monitor ? std::vector<PHLMONITOR>{monitor} : std::vector<PHLMONITOR>{};
+@@ -231,9 +229,9 @@ int luaAdjust(lua_State *state) {
+ }
+ 
+ void resetAllMonitors() {
+-  if (!State::monitorState())
++  if (!g_pCompositor)
+     return;
+-  for (const auto &monitor : State::monitorState()->monitors()) {
++  for (const auto &monitor : g_pCompositor->m_monitors) {
+     if (monitor && monitor->m_cursorZoom)
+       monitor->m_cursorZoom->setValueAndWarp(1.F);
+   }
