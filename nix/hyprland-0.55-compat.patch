@@ -1,10 +1,8 @@
-diff --git a/src/main.cpp b/src/main.cpp
-index 98352b3..4404158 100644
 --- a/src/main.cpp
 +++ b/src/main.cpp
-@@ -15,9 +15,9 @@
- #include <hyprland/src/config/values/types/StringValue.hpp>
- #include <hyprland/src/event/EventBus.hpp>
+@@ -19,9 +19,9 @@
+ #include <hyprland/src/managers/eventLoop/EventLoopManager.hpp>
+ #include <hyprland/src/managers/eventLoop/EventLoopTimer.hpp>
  #include <hyprland/src/managers/input/InputManager.hpp>
 -#include <hyprland/src/output/Monitor.hpp>
 +#include <hyprland/src/Compositor.hpp>
@@ -14,7 +12,7 @@ index 98352b3..4404158 100644
  
  extern "C" {
  #include <lauxlib.h>
-@@ -48,21 +48,19 @@ SDispatchResult failure(std::string message) {
+@@ -77,21 +77,19 @@
  }
  
  PHLMONITOR monitorUnderPointer() {
@@ -41,7 +39,7 @@ index 98352b3..4404158 100644
  
    const auto monitor = monitorUnderPointer();
    return monitor ? std::vector<PHLMONITOR>{monitor} : std::vector<PHLMONITOR>{};
-@@ -231,9 +229,9 @@ int luaAdjust(lua_State *state) {
+@@ -370,9 +368,9 @@
  }
  
  void resetAllMonitors() {
